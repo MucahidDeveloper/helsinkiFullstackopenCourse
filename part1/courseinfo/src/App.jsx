@@ -1,50 +1,37 @@
 const App = () => {
   const course = 'Half Stack application development'
-  const part1 = 'Fundamentals of React'
-  const exercises1 = 10
-  const part2 = 'Using props to pass data'
-  const exercises2 = 7
-  const part3 = 'State of a component'
-  const exercises3 = 14
 
-  
-  const exercises = [exercises1, exercises2, exercises3]
-    
-  const parts = [part1, part2, part3]
+  const parts = [
+    { name: 'Fundamentals of React', exercises: 10 },
+    { name: 'Using props to pass data', exercises: 7 },
+    { name: 'State of a component', exercises: 14 }
+  ]
 
-  const Header = () => {
-    return (
-      <h1>{course}</h1>
-    )
+  const Header = ({ course }) => {
+    return <h1>{course}</h1>
   }
-  const Content = (props) => {
-    return (
-      <span>
-      {parts[props.index]}
-      </span>
-    )
+
+  // مكون Part لعرض جزء معين
+  const Part = (props) => {
+    return <p>{props.name} {props.exercises}</p>
   }
-  const Total = (props) => {
+
+  // مكون Content يحتوي على 3 مكونات Part
+  const Content = ({ parts }) => {
     return (
-      <span>
-      {exercises[props.index]}
-      </span>
+      <div>
+        {parts.map((part, index) => (
+          <Part key={index} name={part.name} exercises={part.exercises} />
+        ))}
+      </div>
     )
   }
 
   return (
     <div>
-      <Header />
-      <p>
-        <Content index={0} /> <Total index={0} />
-      </p>
-      <p>
-       <Content index={1} /> <Total index={1} />
-      </p>
-      <p>
-        <Content index={2} /> <Total index={2} />
-      </p>
-      <p>Number of exercises {exercises1 + exercises2 + exercises3}</p>
+      <Header course={course} />
+      <Content parts={parts} />
+      <p><strong>Number of exercises:</strong> {parts.reduce((sum, part) => sum + part.exercises, 0)}</p>
     </div>
   )
 }
