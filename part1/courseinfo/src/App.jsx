@@ -1,28 +1,33 @@
 const App = () => {
   const course = 'Half Stack application development'
 
-  const parts = [
-    { name: 'Fundamentals of React', exercises: 10 },
-    { name: 'Using props to pass data', exercises: 7 },
-    { name: 'State of a component', exercises: 14 }
-  ]
-
-  const Header = ({ course }) => {
-    return <h1>{course}</h1>
+  const part1 = {
+    name: 'Fundamentals of React',
+    exercises: 10
+  }
+  const part2 = {
+    name: 'Using props to pass data',
+    exercises: 7
+  }
+  const part3 = {
+    name: 'State of a component',
+    exercises: 14
   }
 
-  // مكون Part لعرض جزء معين
+  const Header = (props) => {
+    return <h1>{props.course}</h1>
+  }
+
   const Part = (props) => {
-    return <p>{props.name} {props.exercises}</p>
+    return <p>{props.part.name} {props.part.exercises}</p>
   }
 
-  // مكون Content يحتوي على 3 مكونات Part
-  const Content = ({ parts }) => {
+  const Content = (props) => {
     return (
       <div>
-        {parts.map((part, index) => (
-          <Part key={index} name={part.name} exercises={part.exercises} />
-        ))}
+        <Part part={props.part1} />
+        <Part part={props.part2} />
+        <Part part={props.part3} />
       </div>
     )
   }
@@ -30,8 +35,8 @@ const App = () => {
   return (
     <div>
       <Header course={course} />
-      <Content parts={parts} />
-      <p><strong>Number of exercises:</strong> {parts.reduce((sum, part) => sum + part.exercises, 0)}</p>
+      <Content part1={part1} part2={part2} part3={part3} />
+      <p><strong>Number of exercises:</strong> {part1.exercises + part2.exercises + part3.exercises}</p>
     </div>
   )
 }
