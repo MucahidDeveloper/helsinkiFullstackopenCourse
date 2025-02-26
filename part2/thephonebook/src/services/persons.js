@@ -10,6 +10,15 @@ const getAll = () => {
     });
 };
 
+const update = (id, updatedObject) => {
+  const request = axios.put(`${baseUrl}/${id}`, updatedObject);
+  return request
+    .then((response) => response.data)
+    .catch((error) => {
+      console.log("Failed to update person", error);
+    });
+};
+
 const create = (newObject) => {
   const request = axios.post(baseUrl, newObject);
   return request
@@ -28,4 +37,4 @@ const erase = (id) => {
     });
 };
 
-export default { getAll, create, erase };
+export default { getAll, create, erase, update };
