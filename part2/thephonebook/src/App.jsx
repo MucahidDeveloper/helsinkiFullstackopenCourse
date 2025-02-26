@@ -37,13 +37,27 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: persons.length + 1,
+      id: String(Math.random().toFixed(5) * 100000),
     };
     setPersons([...persons, newPerson]);
     setNewName("");
     setNewNumber("");
 
     personService.create(newPerson);
+  };
+
+  const handleDelete = (id) => {
+    const person = persons.find((p) => p.id === id);
+    if (!person) {
+      alert("Person already removed from the server");
+      return;
+    }
+
+    if (window.confirm("Are you sure you want to delete this contact?")) {
+      personService.erase(id);
+      const newPersons = persons.filter((person) => person.id !== id);
+      setPersons(newPersons);
+    }
   };
 
   const filteredPersons = search
@@ -65,7 +79,7 @@ const App = () => {
         handleNewPerson={handleNewPerson}
       />
       <h3>Numbers</h3>
-      <Persons persons={filteredPersons} />
+      <Persons persons={filteredPersons} handleDelete={handleDelete} />
     </div>
   );
 };

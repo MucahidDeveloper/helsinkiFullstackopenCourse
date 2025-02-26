@@ -6,7 +6,7 @@ const getAll = () => {
   return request
     .then((response) => response.data)
     .catch((error) => {
-      console.log("fail to get data");
+      console.log("Failed to get data", error);
     });
 };
 
@@ -15,8 +15,17 @@ const create = (newObject) => {
   return request
     .then((response) => response.data)
     .catch((error) => {
-      console.log("fail to create data");
+      console.log("Failed to create data", error);
     });
 };
 
-export default { getAll, create };
+const erase = (id) => {
+  const request = axios.delete(`${baseUrl}/${id}`);
+  return request
+    .then((response) => response.data)
+    .catch((error) => {
+      console.log("Failed to delete person", error);
+    });
+};
+
+export default { getAll, create, erase };
