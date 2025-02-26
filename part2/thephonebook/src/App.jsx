@@ -40,10 +40,23 @@ const App = () => {
       alert(`${newName} is already added to the phonebook`);
       return;
     }
-    const newPerson = { name: newName, number: newNumber };
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
     setPersons([...persons, newPerson]);
     setNewName("");
     setNewNumber("");
+
+    axios
+      .post("http://localhost:3001/persons", newPerson)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const filteredPersons = search
