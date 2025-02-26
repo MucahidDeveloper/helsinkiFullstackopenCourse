@@ -1,7 +1,7 @@
 const Persons = ({ persons }) => (
   <div>
     {persons.map((person, index) => (
-      <h3 key="{index}">
+      <h3 key={person.id}>
         {person.name} {person.number}
       </h3>
     ))}
