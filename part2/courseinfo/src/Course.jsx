@@ -9,14 +9,6 @@ const Course = ({ course }) => {
   );
 };
 
-const Courses = ({ courses }) => (
-  <div>
-    {courses.map(course => (
-      <Course key={course.id} course={course} />
-    ))}
-  </div>
-);
-
 const Header = ({ name }) => <h1>{name}</h1>;
 
 const Content = ({ parts }) => (
@@ -33,6 +25,6 @@ const Part = ({ name, exercises }) => (
   </p>
 );
 
-const Total = ({ total }) => <p>Total number of exercises: {total}</p>;
+const Total = ({ total }) => <p><strong>Total of exercises:</strong> {total}</p>;
 
-export default Courses;
+export default Course;
