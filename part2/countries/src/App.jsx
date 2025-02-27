@@ -1,79 +1,89 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api";
+
+const CountryList = ({ countries, handleShow }) => (
+  <div>
+    {countries.map((country) => (
+      <div key={country.name.common}>
+        {country.name.common}
+        <button onClick={() => handleShow(country.name.common)}>show</button>
+      </div>
+    ))}
+  </div>
+);
+
+const CountryDetails = ({ country }) => (
+  <div>
+    <h2>{country.name.common}</h2>
+    <p>Capital: {country.capital}</p>
+    <p>Area: {country.area}</p>
+    <h3>Languages:</h3>
+    <ul>
+      {Object.values(country.languages).map((language) => (
+        <li key={language}>{language}</li>
+      ))}
+    </ul>
+    <img
+      src={country.flags.png}
+      alt={`Flag of ${country.name.common}`}
+      width="150"
+    />
+  </div>
+);
+
 const App = () => {
   const [countries, setCountries] = useState([]);
   const [search, setSearch] = useState("");
-  const [filteredCountries, setFilteredCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
-      .then((response) => setCountries(response.data))
-      .catch((error) => console.log("Error fetching countries:", error));
-  }, []);
+    if (search) {
+      axios
+        .get(`${baseUrl}/all`)
+        .then((response) => {
+          const filtered = response.data.filter((country) =>
+            country.name.common.toLowerCase().includes(search.toLowerCase())
+          );
+          setCountries(filtered);
+          if (filtered.length === 1) {
+            setSelectedCountry(filtered[0]);
+          } else {
+            setSelectedCountry(null);
+          }
+        })
+        .catch((error) => console.log("Failed to fetch countries", error));
+    } else {
+      setCountries([]);
+      setSelectedCountry(null);
+    }
+  }, [search]);
 
   const handleSearchChange = (event) => {
-    const query = event.target.value;
-    setSearch(query);
-
-    if (query) {
-      const results = countries.filter((country) =>
-        country.name.common.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredCountries(results);
-    } else {
-      setFilteredCountries([]);
-    }
+    setSearch(event.target.value);
   };
 
-  const renderCountries = () => {
-    if (filteredCountries.length > 10) {
-      return <p>Too many matches, please refine your search.</p>;
-    }
-    if (filteredCountries.length > 1) {
-      return (
-        <ul>
-          {filteredCountries.map((country) => (
-            <li key={country.cca3}>{country.name.common}</li>
-          ))}
-        </ul>
-      );
-    }
-    if (filteredCountries.length === 1) {
-      const country = filteredCountries[0];
-      return (
-        <div>
-          <h2>{country.name.common}</h2>
-          <p>Capital: {country.capital}</p>
-          <p>Area: {country.area}</p>
-          <h3>Languages:</h3>
-          <ul>
-            {Object.values(country.languages).map((lang) => (
-              <li key={lang}>{lang}</li>
-            ))}
-          </ul>
-          <img
-            src={country.flags.png}
-            alt={`Flag of ${country.name.common}`}
-            width="100"
-          />
-        </div>
-      );
-    }
-    return null;
+  const handleShow = (name) => {
+    const country = countries.find((c) => c.name.common === name);
+    setSelectedCountry(country);
   };
 
   return (
     <div>
-      <h1>Country Info</h1>
       <input
         type="text"
         value={search}
         onChange={handleSearchChange}
-        placeholder="Search for a country..."
+        placeholder="Search for a country"
       />
-      {renderCountries()}
+      {selectedCountry ? (
+        <CountryDetails country={selectedCountry} />
+      ) : countries.length > 10 ? (
+        <p>Too many matches, please specify another filter.</p>
+      ) : (
+        <CountryList countries={countries} handleShow={handleShow} />
+      )}
     </div>
   );
 };
