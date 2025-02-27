@@ -125,7 +125,9 @@ const App = () => {
           }, 5000);
         })
         .catch((error) => {
-          setNotification(`Failed to delete ${person.name}`);
+          setNotification(
+            `Failed to delete ${person.name} or it's already deleted`
+          );
           setNotificationType("error");
           setTimeout(() => {
             setNotification(null);
