@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api";
+const weatherApiKey = import.meta.env.VITE_WEATHERAPIKEY;
+console.log("API Key:", weatherApiKey);
 
 const CountryList = ({ countries, handleShow }) => (
   <div>
@@ -14,24 +16,51 @@ const CountryList = ({ countries, handleShow }) => (
   </div>
 );
 
-const CountryDetails = ({ country }) => (
-  <div>
-    <h2>{country.name.common}</h2>
-    <p>Capital: {country.capital}</p>
-    <p>Area: {country.area}</p>
-    <h3>Languages:</h3>
-    <ul>
-      {Object.values(country.languages).map((language) => (
-        <li key={language}>{language}</li>
-      ))}
-    </ul>
-    <img
-      src={country.flags.png}
-      alt={`Flag of ${country.name.common}`}
-      width="150"
-    />
-  </div>
-);
+const CountryDetails = ({ country }) => {
+  const [weather, setWeather] = useState(null);
+
+  useEffect(() => {
+    if (country.capital) {
+      const capital = country.capital[0];
+      axios
+        .get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${capital}&units=metric&appid=${weatherApiKey}`
+        )
+        .then((response) => setWeather(response.data))
+        .catch((error) => console.log("Failed to fetch weather data", error));
+    }
+  }, [country.capital]);
+
+  return (
+    <div>
+      <h2>{country.name.common}</h2>
+      <p>Capital: {country.capital}</p>
+      <p>Area: {country.area}</p>
+      <h3>Languages:</h3>
+      <ul>
+        {Object.values(country.languages).map((language) => (
+          <li key={language}>{language}</li>
+        ))}
+      </ul>
+      <img
+        src={country.flags.png}
+        alt={`Flag of ${country.name.common}`}
+        width="150"
+      />
+      {weather && (
+        <div>
+          <h3>Weather in {country.capital[0]}</h3>
+          <p>Temperature: {weather.main.temp}°C</p>
+          <p>Weather: {weather.weather[0].description}</p>
+          <img
+            src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+            alt={weather.weather[0].description}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const App = () => {
   const [countries, setCountries] = useState([]);
