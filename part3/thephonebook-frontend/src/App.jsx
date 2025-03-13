@@ -71,7 +71,9 @@ const App = () => {
             }, 5000);
           })
           .catch((error) => {
-            setNotification(`Failed to update contact ${newName}`);
+            setNotification(
+              `Failed to update contact ${newName} due to ${error.response.data.error}`
+            );
             setNotificationType("error");
             setTimeout(() => {
               setNotification(null);
@@ -96,7 +98,9 @@ const App = () => {
           }, 5000);
         })
         .catch((error) => {
-          setNotification(`Failed to create contact ${newName}`);
+          setNotification(
+            `Failed to create contact ${newName} due to ${error.response.data.error}`
+          );
           setNotificationType("error");
           setTimeout(() => {
             setNotification(null);
