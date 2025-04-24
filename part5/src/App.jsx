@@ -3,13 +3,23 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import BlogForm from "./components/BlogForm";
-
+import Notification from "./components/Notification";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null,
+  });
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: null, type: null }), 3000);
+  };
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -43,11 +53,9 @@ const App = () => {
 
       setUsername("");
       setPassword("");
+      showNotification("Login successful", "success");
     } catch (exception) {
-      // setErrorMessage("Wrong credentials");
-      setTimeout(() => {
-        // setErrorMessage(null);
-      }, 5000);
+      showNotification("Invalid username or password", "error");
     }
   };
 
@@ -56,15 +64,19 @@ const App = () => {
     blogService.clearToken();
     setUser(null);
     setBlogs([]);
+    showNotification("Logged out successfully", "success");
   };
 
   const addBlog = async (newBlog) => {
-    blogService.setToken(user.token);
     try {
       const savedBlog = await blogService.create(newBlog);
       setBlogs(blogs.concat(savedBlog));
-    } catch {
-      console.log("failed to add blog");
+      showNotification(
+        `Added blog: ${savedBlog.title} by ${savedBlog.author}`,
+        "success"
+      );
+    } catch (err) {
+      showNotification("Failed to add blog", "error");
     }
   };
 
@@ -98,6 +110,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={notification.message} type={notification.type} />
 
       {user === null ? (
         loginForm()
