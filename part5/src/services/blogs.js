@@ -19,8 +19,9 @@ const getAll = () => {
 };
 
 const create = async (newObject) => {
+  console.log("TOKEN IN SERVICE ⇒", token);
   const config = {
-    headers: { Authorization: token },
+    headers: { Authorization: `Bearer ${token}` },
   };
 
   const response = await axios.post(baseUrl, newObject, config);
