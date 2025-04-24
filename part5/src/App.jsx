@@ -10,6 +10,24 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    if (loggedUserJSON) {
+      const user = loggedUserJSON;
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      blogService
+        .getAll()
+        .then((blogs) => setBlogs(blogs))
+        .catch(() => handleLogout());
+    }
+  }, [user]);
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -18,21 +36,26 @@ const App = () => {
         username,
         password,
       });
-
+      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
+
       setUsername("");
       setPassword("");
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      // setErrorMessage("Wrong credentials");
       setTimeout(() => {
-        setErrorMessage(null);
+        // setErrorMessage(null);
       }, 5000);
     }
   };
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+
+  const handleLogout = () => {
+    window.localStorage.removeItem("loggedBlogAppUser");
+    blogService.clearToken();
+    setUser(null);
+    setBlogs([]);
+  };
 
   const loginForm = () => (
     <form onSubmit={handleLogin}>
@@ -60,10 +83,10 @@ const App = () => {
 
   const blogForm = () =>
     blogs.map((blog) => <Blog key={blog.id} blog={blog} />);
-    // <form onSubmit={addBlog}>
-    //   <input value={newBlog} onChange={handleBlogChange} />
-    // <button type="submit">save</button>
-    // </form>
+  // <form onSubmit={addBlog}>
+  //   <input value={newBlog} onChange={handleBlogChange} />
+  // <button type="submit">save</button>
+  // </form>
 
   return (
     <div>
@@ -74,6 +97,7 @@ const App = () => {
       ) : (
         <div>
           <p>{user.name} logged-in</p>
+          <button onClick={handleLogout}>log out</button>
           {blogForm()}
         </div>
       )}
