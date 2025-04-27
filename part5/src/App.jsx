@@ -110,9 +110,16 @@ const App = () => {
     </form>
   );
 
-  const blogForm = () =>
-    blogs.map((blog) => <Blog key={blog.id} blog={blog} />);
+  const updateBlogList = (updatedBlog) => {
+    setBlogs(
+      blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
+    );
+  };
 
+  const blogForm = () =>
+    blogs.map((blog) => (
+      <Blog key={blog.id} blog={blog} updateBlogList={updateBlogList} />
+    ));
   return (
     <div>
       <h2>blogs</h2>

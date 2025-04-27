@@ -1,6 +1,7 @@
 import { useState } from "react";
+import blogService from "../services/blogs"; // تأكد من المسار
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlogList }) => {
   const [visible, setVisible] = useState(false);
 
   const blogStyle = {
@@ -16,6 +17,23 @@ const Blog = ({ blog }) => {
     setVisible(!visible);
   };
 
+  const handleLike = async () => {
+    const updatedBlog = {
+      user: blog.user.id || blog.user,
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url,
+    };
+
+    try {
+      const returnedBlog = await blogService.update(blog.id, updatedBlog);
+      updateBlogList(returnedBlog); // نحدث القائمة في الأب (App.jsx)
+    } catch (error) {
+      console.error("Failed to like the blog", error);
+    }
+  };
+
   return (
     <div style={blogStyle} className="blog">
       <div>
@@ -28,9 +46,9 @@ const Blog = ({ blog }) => {
           <div>{blog.url}</div>
           <div>
             likes {blog.likes}
-            <button>like</button>
+            <button onClick={handleLike}>like</button>
           </div>
-          <div>{blog.user?.name}</div>
+          <div>{blog.user.name}</div>
         </div>
       )}
     </div>
