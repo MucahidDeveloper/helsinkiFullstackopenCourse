@@ -18,8 +18,8 @@ const Blog = ({ blog, updateBlogList }) => {
   };
 
   const handleLike = async () => {
-    const updatedBlog = {
-      user: blog.user.id || blog.user,
+    const updatedBlogData = {
+      user: blog.user?.id || blog.user,
       likes: blog.likes + 1,
       author: blog.author,
       title: blog.title,
@@ -27,8 +27,15 @@ const Blog = ({ blog, updateBlogList }) => {
     };
 
     try {
-      const returnedBlog = await blogService.update(blog.id, updatedBlog);
-      updateBlogList(returnedBlog); // نحدث القائمة في الأب (App.jsx)
+      const returnedBlog = await blogService.update(blog.id, updatedBlogData);
+
+      // نربط بيانات المستخدم القديمة (التي تحتوي على الاسم) مرة أخرى
+      const updatedBlogWithUser = {
+        ...returnedBlog,
+        user: blog.user,
+      };
+
+      updateBlogList(updatedBlogWithUser);
     } catch (error) {
       console.error("Failed to like the blog", error);
     }
