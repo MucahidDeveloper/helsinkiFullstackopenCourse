@@ -1,7 +1,7 @@
 import { useState } from "react";
-import blogService from "../services/blogs"; // تأكد من المسار
+import blogService from "../services/blogs";
 
-const Blog = ({ blog, updateBlogList }) => {
+const Blog = ({ blog, user, updateBlogList }) => {
   const [visible, setVisible] = useState(false);
 
   const blogStyle = {
@@ -28,8 +28,6 @@ const Blog = ({ blog, updateBlogList }) => {
 
     try {
       const returnedBlog = await blogService.update(blog.id, updatedBlogData);
-
-      // نربط بيانات المستخدم القديمة (التي تحتوي على الاسم) مرة أخرى
       const updatedBlogWithUser = {
         ...returnedBlog,
         user: blog.user,
@@ -38,6 +36,21 @@ const Blog = ({ blog, updateBlogList }) => {
       updateBlogList(updatedBlogWithUser);
     } catch (error) {
       console.error("Failed to like the blog", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${blog.title}"?`
+    );
+    if (confirmed) {
+      try {
+        await blogService.remove(blog.id);
+
+        updateBlogList(blog.id);
+      } catch (error) {
+        console.error("Failed to delete the blog", error);
+      }
     }
   };
 
@@ -56,6 +69,9 @@ const Blog = ({ blog, updateBlogList }) => {
             <button onClick={handleLike}>like</button>
           </div>
           <div>{blog.user.name}</div>
+          {user && blog.user.username === user.username && (
+            <button onClick={handleDelete}>delete</button>
+          )}
         </div>
       )}
     </div>
