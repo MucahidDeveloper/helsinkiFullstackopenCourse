@@ -5,9 +5,17 @@ const BlogForm = ({ onCreate }) => {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCreate({ title, author, url }); // likes = 0 by default
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const newBlog = {
+      title,
+      author,
+      url,
+    };
+
+    onCreate(newBlog);
+
     setTitle("");
     setAuthor("");
     setUrl("");
@@ -15,28 +23,37 @@ const BlogForm = ({ onCreate }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>create new</h3>
       <div>
-        title&nbsp;
+        title:
         <input
+          type="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
+          name="Title"
+          onChange={({ target }) => setTitle(target.value)}
+          placeholder="Enter blog title"
         />
       </div>
       <div>
-        author&nbsp;
+        author:
         <input
+          type="text"
           value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          required
+          name="Author"
+          onChange={({ target }) => setAuthor(target.value)}
+          placeholder="Enter author name"
         />
       </div>
       <div>
-        url&nbsp;
-        <input value={url} onChange={(e) => setUrl(e.target.value)} required />
+        url:
+        <input
+          type="text"
+          value={url}
+          name="URL"
+          onChange={({ target }) => setUrl(target.value)}
+          placeholder="Enter blog URL"
+        />
       </div>
-      <button type="submit">create</button>
+      <button type="submit">Create</button>
     </form>
   );
 };
