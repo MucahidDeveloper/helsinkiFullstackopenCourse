@@ -1,5 +1,6 @@
 import { useState } from "react";
-import blogService from "../services/blogs";
+import PropTypes from "prop-types"; // Import PropTypes
+import blogService from "../services/blogs"; // تأكد من المسار
 
 const Blog = ({ blog, user, updateBlogList }) => {
   const [visible, setVisible] = useState(false);
@@ -28,6 +29,8 @@ const Blog = ({ blog, user, updateBlogList }) => {
 
     try {
       const returnedBlog = await blogService.update(blog.id, updatedBlogData);
+
+      // نربط بيانات المستخدم القديمة (التي تحتوي على الاسم) مرة أخرى
       const updatedBlogWithUser = {
         ...returnedBlog,
         user: blog.user,
@@ -46,8 +49,7 @@ const Blog = ({ blog, user, updateBlogList }) => {
     if (confirmed) {
       try {
         await blogService.remove(blog.id);
-
-        updateBlogList(blog.id);
+        updateBlogList(blog.id); // نمرر id المدونة التي تم حذفها
       } catch (error) {
         console.error("Failed to delete the blog", error);
       }
@@ -76,6 +78,27 @@ const Blog = ({ blog, user, updateBlogList }) => {
       )}
     </div>
   );
+};
+
+// Define PropTypes for the Blog component
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
+    likes: PropTypes.number.isRequired,
+    author: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+  }).isRequired,
+  user: PropTypes.shape({
+    username: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+  }),
+  updateBlogList: PropTypes.func.isRequired,
 };
 
 export default Blog;
