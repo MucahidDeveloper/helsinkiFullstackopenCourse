@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import BlogForm from "./components/BlogForm";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
 
@@ -16,6 +17,8 @@ const App = () => {
     type: null,
   });
 
+  const blogFormRef = useRef();
+
   const showNotification = (message, type = "success") => {
     setNotification({ message, type });
     setTimeout(() => setNotification({ message: null, type: null }), 3000);
@@ -24,7 +27,7 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
     if (loggedUserJSON) {
-      const user = loggedUserJSON;
+      const user = JSON.parse(loggedUserJSON);
       setUser(user);
       blogService.setToken(user.token);
     }
@@ -41,19 +44,21 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
     try {
       const user = await loginService.login({
         username,
         password,
       });
-      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-
-      setUsername("");
-      setPassword("");
-      showNotification("Login successful", "success");
+      if (user) {
+        window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user)); // ✅ تأكد أنه كائن وليس undefined
+        blogService.setToken(user.token);
+        setUser(user);
+        setUsername("");
+        setPassword("");
+        showNotification("Login successful", "success");
+      } else {
+        showNotification("Login failed: No user data", "error");
+      }
     } catch (exception) {
       showNotification("Invalid username or password", "error");
     }
@@ -71,6 +76,7 @@ const App = () => {
     try {
       const savedBlog = await blogService.create(newBlog);
       setBlogs(blogs.concat(savedBlog));
+      blogFormRef.current.toggleVisibility();
       showNotification(
         `Added blog: ${savedBlog.title} by ${savedBlog.author}`,
         "success"
@@ -118,7 +124,9 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>log out</button>
-          <BlogForm onCreate={addBlog} />
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <BlogForm onCreate={addBlog} />
+          </Togglable>
           {blogForm()}
         </div>
       )}
