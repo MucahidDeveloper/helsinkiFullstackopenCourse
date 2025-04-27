@@ -37,7 +37,11 @@ const App = () => {
     if (user) {
       blogService
         .getAll()
-        .then((blogs) => setBlogs(blogs))
+        .then((blogs) => {
+          // ترتيب المدونات حسب عدد اللايكات (من الأعلى إلى الأدنى)
+          const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+          setBlogs(sortedBlogs);
+        })
         .catch(() => handleLogout());
     }
   }, [user]);
