@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, user, updateBlogList }) => {
+const Blog = ({ blog, user, updateBlogList, onLike }) => {
   const [visible, setVisible] = useState(false);
 
   const blogStyle = {
@@ -19,6 +19,11 @@ const Blog = ({ blog, user, updateBlogList }) => {
   };
 
   const handleLike = async () => {
+    if (onLike) {
+      onLike(blog);
+      return;
+    }
+
     const updatedBlogData = {
       user: blog.user?.id || blog.user,
       likes: blog.likes + 1,
@@ -104,6 +109,7 @@ Blog.propTypes = {
     name: PropTypes.string.isRequired,
   }),
   updateBlogList: PropTypes.func.isRequired,
+  onLike: PropTypes.func,
 };
 
 export default Blog;
