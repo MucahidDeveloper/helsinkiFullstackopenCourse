@@ -1,6 +1,6 @@
 import { useState } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
-import blogService from "../services/blogs"; // تأكد من المسار
+import PropTypes from "prop-types";
+import blogService from "../services/blogs";
 
 const Blog = ({ blog, user, updateBlogList }) => {
   const [visible, setVisible] = useState(false);
@@ -30,7 +30,6 @@ const Blog = ({ blog, user, updateBlogList }) => {
     try {
       const returnedBlog = await blogService.update(blog.id, updatedBlogData);
 
-      // نربط بيانات المستخدم القديمة (التي تحتوي على الاسم) مرة أخرى
       const updatedBlogWithUser = {
         ...returnedBlog,
         user: blog.user,
@@ -49,7 +48,7 @@ const Blog = ({ blog, user, updateBlogList }) => {
     if (confirmed) {
       try {
         await blogService.remove(blog.id);
-        updateBlogList(blog.id); // نمرر id المدونة التي تم حذفها
+        updateBlogList(blog.id);
       } catch (error) {
         console.error("Failed to delete the blog", error);
       }
@@ -58,21 +57,28 @@ const Blog = ({ blog, user, updateBlogList }) => {
 
   return (
     <div style={blogStyle} className="blog">
-      <div>
-        {blog.title} {blog.author}
-        <button onClick={toggleVisibility}>{visible ? "hide" : "view"}</button>
+      <div className="blog-header">
+        <span className="blog-title">{blog.title}</span>
+        <span className="blog-author">{blog.author}</span>
+        <button onClick={toggleVisibility} className="toggle-visibility">
+          {visible ? "hide" : "view"}
+        </button>
       </div>
 
       {visible && (
         <div className="blog-details">
-          <div>{blog.url}</div>
-          <div>
+          <div className="blog-url">{blog.url}</div>
+          <div className="blog-likes">
             likes {blog.likes}
-            <button onClick={handleLike}>like</button>
+            <button onClick={handleLike} className="like-button">
+              like
+            </button>
           </div>
-          <div>{blog.user.name}</div>
+          <div className="blog-user">{blog.user.name}</div>
           {user && blog.user.username === user.username && (
-            <button onClick={handleDelete}>delete</button>
+            <button onClick={handleDelete} className="delete-button">
+              delete
+            </button>
           )}
         </div>
       )}
@@ -80,7 +86,6 @@ const Blog = ({ blog, user, updateBlogList }) => {
   );
 };
 
-// Define PropTypes for the Blog component
 Blog.propTypes = {
   blog: PropTypes.shape({
     id: PropTypes.string.isRequired,
