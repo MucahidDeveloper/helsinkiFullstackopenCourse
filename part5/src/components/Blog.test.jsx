@@ -1,35 +1,31 @@
 import { render, screen } from "@testing-library/react";
-import Blog from "./Blog";
+import userEvent from "@testing-library/user-event";
+import Blog from "./Blog"; // تأكد من المسار الصحيح للكومبوننت
 
-test("renders blog title and author, but not url or likes by default", () => {
+test("renders url and likes when view button is clicked", async () => {
   const blog = {
+    title: "React patterns",
+    author: "Michael Chan",
+    url: "https://reactpatterns.com/",
+    likes: 7,
     user: {
       username: "testuser",
       name: "Test User",
-      id: "1234",
     },
-    likes: 5,
-    author: "Author Name",
-    title: "Blog Title",
-    url: "https://example.com",
   };
 
-  render(
-    <Blog
-      blog={blog}
-      user={{ username: "testuser", name: "Test User" }}
-      updateBlogList={() => {}}
-    />
-  );
+  render(<Blog blog={blog} />);
 
-  // تحقق من أن العنوان والمؤلف ظاهرين
-  expect(screen.getByText("Blog Title")).toBeInTheDocument();
-  expect(screen.getByText("Author Name")).toBeInTheDocument();
+  const user = userEvent.setup();
 
-  // تحقق من أن الرابط وعدد الإعجابات غير ظاهرين
-  const url = screen.queryByText("https://example.com");
-  const likes = screen.queryByText(/likes/i);
+  // نضغط على زر view
+  const viewButton = screen.getByText("view");
+  await user.click(viewButton);
 
-  expect(url).not.toBeInTheDocument();
-  expect(likes).not.toBeInTheDocument();
+  // التأكد من ظهور الرابط وعدد الإعجابات بعد الضغط
+  const urlElement = screen.getByText("https://reactpatterns.com/");
+  const likesElement = screen.getByText("likes 7");
+
+  expect(urlElement).toBeDefined();
+  expect(likesElement).toBeDefined();
 });
